@@ -4,7 +4,7 @@ This module visualizes the Collatz Conjecture using Pygame.
 Author: Jakob Lucas
 """
 
-import pygame
+import pygame # type: ignore
 import math
 import random
 
@@ -15,6 +15,9 @@ SCREEN_WIDTH = 2560
 SCREEN_HEIGHT = 1440
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+color1 = pygame.Color(255, 0, 0)
+color2 = pygame.Color(0, 0, 255)
 
 # Distance between squares on each axis
 start_degree = 90
@@ -31,7 +34,8 @@ square_spawn = [0, SCREEN_HEIGHT]
 # Gets the next value of a number based on the Collatx conjecture 
 def get_next(num: int) -> int:
     return num // 2 if num % 2 == 0 else 3 * num + 1
-    
+
+# Get the positions of each subsequent number in a sequence
 def get_sequence_positions(n: int, s_degree: float) -> list[tuple[int, int]]:
     m = n
     step = 1
@@ -57,7 +61,6 @@ def get_sequence_positions(n: int, s_degree: float) -> list[tuple[int, int]]:
         y = math.sin(math.radians(angle)) * length + y
         
         positions[step - 1] = (x + SCREEN_WIDTH // 2, y + SCREEN_HEIGHT // 2)
-        
         # Get the next value in the sequence
         step += 1
     
@@ -97,10 +100,19 @@ while run:
         start_degree += random.randint(0, 45)
     
     # Draw each square from every sequence
-    for g in range(len(sequence_positions)):
-        for s in range(1, len(sequence_positions[g])):
-            pygame.draw.line(screen, pygame.Color(213, 224, 216, 0), sequence_positions[g][s - 1], sequence_positions[g][s])
-        pygame.draw.rect(screen, pygame.Color(255, 0, 0), pygame.Rect(sequence_positions[g][s][0], sequence_positions[g][s][1], 3, 3), width=0)
+    for sequence_index in range(len(sequence_positions)):
+        for position_index in range(1, len(sequence_positions[sequence_index])):
+            
+            percent = position_index / len(sequence_positions[sequence_index]) 
+            print(f"percent: {percent}")
+            
+            r = int(color1.r + percent * (color2.r - color1.r))
+            g = int(color1.g + percent * (color2.g - color1.g))
+            b = int(color1.b + percent * (color2.b - color1.b))
+            
+            print(f"r: {r}, g: {g}, b: {b}")
+            
+            pygame.draw.line(screen, pygame.Color(r, g, b), sequence_positions[sequence_index][position_index - 1], sequence_positions[sequence_index][position_index])
     
     # Exit
     if key[pygame.K_ESCAPE]:
