@@ -1,3 +1,11 @@
+"""
+
+Collatz Visualization
+
+Author: Jakob Lucas
+
+"""
+
 import pygame
 
 pygame.init()
@@ -13,6 +21,9 @@ square_size = 10
 # Distance between squares on each axis
 axis_multiplier = [2, 2]
 
+# Starting point for squares
+square_spawn = [0, SCREEN_HEIGHT]
+
 # Gets the next value of a number based on the Collatx conjecture 
 def get_next(num: int) -> int:
     return num // 2 if num % 2 == 0 else 3 * num + 1
@@ -25,15 +36,20 @@ def create_num_squares(num: int) -> list[pygame.Rect]:
     squares = []
     
     # Initial square in a sequence 
-    squares.append(pygame.Rect((step, m * square_size * axis_multiplier[1], square_size, square_size)))
+    squares.append(pygame.Rect((step, square_spawn[1] - (m * square_size * axis_multiplier[1]), square_size, square_size)))
     
     # Until the number gets to 1, continue to create the sqaures 
     while m != 1:
+    
         # Get the next value in the sequence
         m = get_next(m)
         step += square_size * axis_multiplier[0]
+        
+        x = step 
+        y = square_spawn[1] - (m * square_size * axis_multiplier[1])
+        
         # Create the new square
-        squares.append(pygame.Rect((step, m * square_size * axis_multiplier[1], square_size, square_size)))
+        squares.append(pygame.Rect((x, y, square_size, square_size)))
     
     return squares
 
