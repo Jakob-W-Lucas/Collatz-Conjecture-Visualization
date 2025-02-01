@@ -1,12 +1,11 @@
 """
-
-Collatz Visualization
+This module visualizes the Collatz Conjecture using Pygame.
 
 Author: Jakob Lucas
-
 """
 
 import pygame
+import math
 
 pygame.init()
 
@@ -16,37 +15,46 @@ SCREEN_HEIGHT = 1440
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Size of each square to display
-square_size = 10
 # Distance between squares on each axis
-axis_multiplier = [2, 2]
+start_degree = 90
+degree_increment = 10
+line_length = 30
 
 # Starting point for squares
 square_spawn = [0, SCREEN_HEIGHT]
 
 # Gets the next value of a number based on the Collatx conjecture 
 def get_next(num: int) -> int:
-    if num == 1: return 0
     return num // 2 if num % 2 == 0 else 3 * num + 1
-
-# Creates the pygame rect squares for each number in a sequence
-def get_sequence_positions(num: int) -> list[(int, int)]:
-    m = num
-    step = 0
     
-    positions = []
+def get_sequence_positions(n: int) -> list[tuple[int, int]]:
+    m = n
+    step = 1
     
-    # Until the number gets to 1, continue to create the sqaures 
-    while m >= 1:
+    sequence = [n]
+    while m != 1:
+        m = get_next(m)
+        sequence.append(m)
+    sequence.reverse()
+    
+    positions = [None] * len(sequence)
+    
+    x = math.cos(math.radians(start_degree)) * line_length
+    y = math.sin(math.radians(start_degree)) * line_length
+    
+    # Until the number gets to 1, continue to create the squares 
+    for num in sequence:
         
-        x = step 
-        y = square_spawn[1] - (m * square_size * axis_multiplier[1])
+        angle = start_degree + step * degree_increment + (90 * (num % 2))
+        length = max(line_length // 5, line_length - step)
         
-        positions.append((x, y))
+        x = math.cos(math.radians(angle)) * length + x
+        y = math.sin(math.radians(angle)) * length + y
+        
+        positions[step - 1] = (x + SCREEN_WIDTH // 2, y + SCREEN_HEIGHT // 2)
         
         # Get the next value in the sequence
-        m = get_next(m)
-        step += square_size * axis_multiplier[0]
+        step += 1
     
     return positions
 
@@ -55,7 +63,7 @@ def get_sequence_positions(num: int) -> list[(int, int)]:
 # List of squares for every sequence
 sequence_positions = []
 
-counter = 0
+counter = 888
 n = 0
 
 run = True
@@ -86,6 +94,7 @@ while run:
     for g in range(len(sequence_positions)):
         for s in range(1, len(sequence_positions[g])):
             pygame.draw.line(screen, pygame.Color(213, 224, 216, 0), sequence_positions[g][s - 1], sequence_positions[g][s])
+            pygame.draw.rect(screen, pygame.Color(255, 0, 0), pygame.Rect(sequence_positions[g][s - 1][0], sequence_positions[g][s - 1][1], 3, 3), width=0)
     
     # Exit
     if key[pygame.K_ESCAPE]:
